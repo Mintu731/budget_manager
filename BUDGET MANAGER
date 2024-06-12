@@ -1,0 +1,504 @@
+/*BY 
+B SANKEERTHAN KUMAR
+* 22781A3105
+* DATE-21/02/2024
+* NOTE--PLEASE FOLLOW THE ABOVE INSTUCTIONS TO RUN THE PROGRAM
+*/
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+class filepath{
+public String path(){
+String path="T:\\Text files\\USERDB.xlsx";
+return path;
+}
+}
+public class budgetmanager {
+static int count=0;
+Object arr[][]=new Object[0][0];
+public static void main(String[] args) throws IOException {
+registration r=new registration();
+login l=new login();
+do{
+count=0;
+System.out.println("************************************MAIN MENU************************************");
+System.out.println("(1)LOGIN :\n(2)REGISTER :\n(3)EXIT :");
+System.out.print("SELECT ANY ONE OPTION :");
+Scanner sc =new Scanner(System.in);
+int o=sc.nextInt();
+switch (o) {
+case 1:l.loginid();
+break;
+case 2:r.register();
+break;
+case 3:System.exit(0);
+break;
+case 4525:setupxl();
+break;
+default:{System.out.println("INVALID OPTION");
+count++;}
+}
+}while(count>0);
+}
+public static void setupxl() {
+filepath fi=new filepath();
+File f=new File(fi.path());
+XSSFWorkbook book=new XSSFWorkbook();
+XSSFSheet sheet1= book.createSheet("USRDETAILS");
+Row row;
+Cell cell;
+row=sheet1.createRow(0);
+cell=row.createCell(0);
+cell.setCellValue("USRID");
+cell=row.createCell(1);
+cell.setCellValue("EMAIL");
+cell=row.createCell(2);
+cell.setCellValue("PASSWORD");
+cell=row.createCell(3);
+cell.setCellValue("NAME");
+cell=row.createCell(4);
+cell.setCellValue("MOBILE");
+XSSFSheet sheet2=book.createSheet("INCOME");
+row=sheet2.createRow(0);
+cell=row.createCell(0);
+cell.setCellValue("USER ID");
+cell=row.createCell(1);
+cell.setCellValue("DATE");
+cell=row.createCell(2);
+cell.setCellValue("NOTE");
+cell=row.createCell(3);
+cell.setCellValue("AMOUNT");
+XSSFSheet sheet3=book.createSheet("EXPENCES");
+row=sheet3.createRow(0);
+cell=row.createCell(0);
+cell.setCellValue("USER ID");
+cell=row.createCell(1);
+cell.setCellValue("DATE");
+cell=row.createCell(2);
+cell.setCellValue("NOTE");
+cell=row.createCell(3);
+cell.setCellValue("AMOUNT");
+try{
+FileOutputStream exel=new FileOutputStream(f);
+book.write(exel);
+}
+catch(IOException e){
+System.out.println(e.getLocalizedMessage());
+}
+System.out.println("-----------------SETUP COMPLETED SUCESSFULLY-----------------");
+}
+}
+class registration{
+login l=new login();
+public String getid(int i) {
+String a = "USR";
+String num = String.format("%03d",i);
+return a+ num;
+}
+String name ;
+String num;
+String mail;
+private String pass;
+int count=0;
+Scanner sc=new Scanner(System.in);
+int usrid;
+String usrname;
+void register() throws IOException{
+filepath fi=new filepath();
+File f=new File(fi.path());
+Object arr[]=new Object[100];
+try{
+FileInputStream exel=new FileInputStream(f);
+XSSFWorkbook book=new XSSFWorkbook(exel);
+XSSFSheet sheet=book.getSheet("USRDETAILS");
+int last=sheet.getLastRowNum();
+if(last==50){
+System.out.println("MAXIMUM USERS HAS REACHED \n------PLEASE CONTACT DEVELOPER.");
+System.exit(0);
+}
+for(int i=0;i<=last;i++){
+arr[i]=sheet.getRow(last).getCell(1).getStringCellValue();
+}
+System.out.println("**********ENTER YOUR DETAILS**********");
+do{count=0;
+System.out.println("ENTER YOUR NAME");
+name=sc.nextLine();
+if(name.isBlank()){
+count++;
+System.out.println("NAME IS MANDATORY");
+}
+}while(count>0);
+do{count=0;
+System.out.println("enter mobile number");
+num=sc.nextLine();
+if(num.isBlank()){
+count++;
+System.out.println("NUMBER IS MANDATORY");
+}}while(count>0);
+do{
+System.out.println("ENTER MAIL");
+mail=sc.nextLine().toLowerCase();
+count=0;
+if(mail.isEmpty()){
+count++ ;
+}
+for(int i=0;i<=last;i++){
+if(mail.equals((String) arr[i])){
+count+=3;
+}
+}
+if(count==1){
+System.out.println("MAIL IS MANDATORY");
+}
+if(count>2){
+System.out.println("MAIL ALREADY EXISTS");
+}
+}while(count>0);
+System.out.println("ENTER PASSWORD");
+pass=sc.nextLine();
+String id=getid(last+1);
+System.out.println("YOUR USERID = "+id);
+System.out.println("USER ACCOUNT CREATED SUCESSFULLY");
+Row row;
+Cell cell;
+row=sheet.createRow(last+1);
+cell=row.createCell(0);
+cell.setCellValue(id);
+cell=row.createCell(1);
+cell.setCellValue(mail);
+cell=row.createCell(2);
+cell.setCellValue(pass);
+cell=row.createCell(3);
+cell.setCellValue(name);
+cell=row.createCell(4);
+cell.setCellValue(num);
+FileOutputStream ex=new FileOutputStream(f);
+book.write(ex);
+l.loginid();
+}catch(FileNotFoundException e){}
+sc.close();
+}
+}
+class login {
+budgetmanager p=new budgetmanager();
+int count=0;
+int last=0;
+int m=0;
+Object arr[][]=new Object[100][4];
+Scanner sc=new Scanner(System.in);
+void loginid(){
+filepath fi=new filepath();
+try{
+File f=new File(fi.path());
+FileInputStream inp=new FileInputStream(f);
+XSSFWorkbook book1=new XSSFWorkbook(inp);
+XSSFSheet sh=book1.getSheet("USRDETAILS");
+int last=sh.getLastRowNum();
+if(last==0){
+System.out.println("NO USERS REGISTERED YET");
+p.main(null);
+}
+for(int i=1;i<=last;i++){
+arr[i-1][0]=sh.getRow(i).getCell(0).getStringCellValue();
+arr[i-1][1]=sh.getRow(i).getCell(1).getStringCellValue();
+arr[i-1][2]=sh.getRow(i).getCell(2).getStringCellValue();
+}
+String pas="";
+String id="";
+System.out.println("***************LOGIN***************");
+do{
+count=0;
+System.out.print("ENTER MAIL:");
+String mail=sc.nextLine().trim();
+System.out.print("ENTER PASSWORD:");
+String pass=sc.nextLine().trim();
+if(mail==""){
+count++;
+}for(int i=0;i<last;i++){
+count=0;
+if(mail.toLowerCase().equals((String)arr[i][1])){
+if(pass.equals(arr[i][2])){
+m=i;
+i+=last;
+}else{count++;}
+}else{count++;}
+}if(count>0){
+System.out.println("INVALID DETAILS \n --------TRY AGAIN");
+}
+}while(count>0);
+loginpage(1,(String) arr[m][0]);
+sc.close();
+}catch(Exception e){
+System.out.println(e.getMessage());
+}}
+void loginpage(int f,String uid){
+addtransactions t=new addtransactions();
+veiwtrasaction v=new veiwtrasaction();
+Scanner s=new Scanner(System.in);
+if(f>0){
+System.out.println("-----------------WELCOME-----------------");
+System.out.println("------------------------USER ID ="+arr[m][0]);
+}
+int i=0;
+do{
+System.out.println("*************MENU*************");
+System.out.println("(1)ADD INCOME\n(2)ADD EXPENCE \n(3)VIEW TRANSACTION\n(4)LOGOUT");
+System.out.print("ENTER YOUR CHOICE :");
+int opt=s.nextInt();
+switch (opt) {
+case 1:t.addtransaction(uid,"INCOME");
+break;
+case 2:t.addtransaction(uid,"EXPENCES");
+break;
+case 3:v.transaction(uid);
+case 4:System.out.println("LOGGED OUT SUCESSFULLY");
+        try {
+            p.main(null);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+default:System.out.println("INVALID OPTION");
+break;
+}
+i++;
+}while(true);
+}
+}
+class addtransactions{
+login l=new login();
+int count=0;
+float amount=0;
+String note="";
+String date="";
+Scanner sc=new Scanner(System.in);
+void addtransaction(String uid,String type){
+filepath fi=new filepath();
+try{
+File f=new File(fi.path());
+FileInputStream exel=new FileInputStream(f);
+XSSFWorkbook book=new XSSFWorkbook(exel);
+XSSFSheet usr=book.getSheet("USRDETAILS");
+XSSFSheet inc=book.getSheet(type);
+int last=inc.getLastRowNum();
+do{
+count=0;
+System.out.print("ENTER "+type+":");
+amount=sc.nextFloat();
+sc.nextLine();
+System.out.println("ENTER DATE--FORMAT(DD/MM/YYYY)");
+date =sc.nextLine();
+System.out.print("ENTER NOTE :");
+note=sc.nextLine();
+if(note==""){
+note="-----";
+}
+if(amount<=0||date==""){
+count++;
+System.out.println("FILL ALL THE DETAILS");
+}
+}while(count>0);
+Row row;
+Cell cell;
+row=inc.createRow(last+1);
+cell=row.createCell(0);
+cell.setCellValue(uid);
+cell=row.createCell(1);
+cell.setCellValue(date);
+cell=row.createCell(2);
+cell.setCellValue(note);
+cell=row.createCell(3);
+cell.setCellValue(amount);
+FileOutputStream ex=new FileOutputStream(f);
+book.write(ex);
+System.out.println("SUCESSFULLY ADDED TRANSACTION");
+l.loginpage(0,uid);
+}catch(Exception e){
+System.out.println(e.getMessage());
+}
+}
+}
+class veiwtrasaction{
+int m=0;
+int tem=1;
+int t=1;
+login l=new login();
+int opt;
+int flag=1;
+String sd;
+int count=0;
+float amount=0;
+String note="";
+String date="";
+int temp;
+Scanner sc=new Scanner(System.in);
+void transaction(String id){
+do{count=0;
+System.out.println("*****************VIEW TRANSACTION*****************");
+System.out.println("(1)INCOME TRANSACTIONS\n(2)EXPENCE TRASACTIONS\n(3)TRANSACTION SUMMARY");
+System.out.print("ENTER YOUR CHOICE:");
+opt=sc.nextInt();
+switch(opt){
+case 1:{do{m=0;
+System.out.println("************INCOME TRANSACTIONS***************");
+System.out.println("(1)VIEW ALL\n(2)VIEW BY DATE");
+System.out.print("ENTER YOUR CHOICE:");
+opt=sc.nextInt();
+sc.nextLine();
+if(opt>2){
+System.out.println("INVALID OPTON:");
+m++;
+}
+}while (m>0);
+switch(opt){
+case 1:viewtransaction(id,"INCOME");
+break;
+case 2:System.out.println("ENTER DATE-----FORMAT(DD/MM/YYYY)");
+sd=sc.nextLine();
+viewtransaction(id,"INCOME",sd);
+break;
+default:System.out.println("INVALID OPTON:");
+}
+}
+case 2:{do{m=0;
+System.out.println("***********EXPENCE TRANSACTIONS****************");
+System.out.println("(1)VIEW ALL\n(2)VIEW BY DATE");
+System.out.print("ENTER YOUR CHOICE:");
+opt=sc.nextInt();
+sc.nextLine();
+if(opt>2){
+System.out.println("INVALID OPTON:");
+m++;
+}}while (m>0);
+switch(opt){
+case 1:viewtransaction(id,"EXPENCES");
+break;
+case 2:System.out.println("ENTER DATE-----FORMAT(DD/MM/YYYY)");
+sd=sc.nextLine();
+viewtransaction(id,"EXPENCES",sd);
+break;
+default:System.out.println("INVALID OPTON:");
+}
+}while(count>0);
+case 3:netsummary(id);
+break;
+default:System.out.println("INVALID OPTION:");
+count++;
+}}while ((count>0)); {
+}
+}
+void viewtransaction(String id,String type){
+filepath fi=new filepath();
+Object arr[][]=new Object[100][3];
+File f=new File(fi.path());
+try{
+FileInputStream exel=new FileInputStream(f);
+XSSFWorkbook book=new XSSFWorkbook(exel);
+XSSFSheet sheet=book.getSheet(type);
+int last = sheet.getLastRowNum();
+String usrid=id;
+// for(int i=1;i<=last;i++){
+// if(usrid.equals(sheet.getRow(i).getCell(0).getStringCellValue()
+
+// System.out.println(sheet.getRow(i).getCell(2).getStringCellValue());
+// }
+System.out.println(id);
+arr[0][0]="-----DATE----- ";
+arr[0][1]="-----AMOUNT---- ";
+arr[0][2]=" -----NOTE----- ";
+for(int i=1;i<=last;i++){
+if(usrid.equals(sheet.getRow(i).getCell(0).getStringCellValue())){
+flag++;
+arr[tem][0]=sheet.getRow(i).getCell(1).getStringCellValue();
+arr[tem][1]=(sheet.getRow(i).getCell(3).getNumericCellValue());
+arr[tem][2]=sheet.getRow(i).getCell(2).getStringCellValue();
+tem++;
+}}
+System.out.println(arr[0][0]+" "+ arr[0][1]+""+arr[0][2]);
+for(int i=1;i<flag;i++){
+for(int j=0;j<3;j++){
+System.out.print(arr[i][j]+" ");
+}
+System.out.println("");
+}
+l.loginpage(0,usrid);
+}catch(Exception e){
+System.out.println(e.getMessage());
+}
+}
+void viewtransaction(String id,String type,String date){
+filepath fi=new filepath();
+Object arr[][]=new Object[100][2];
+File f=new File(fi.path());
+try{
+FileInputStream exel=new FileInputStream(f);
+XSSFWorkbook book=new XSSFWorkbook(exel);
+XSSFSheet sheet=book.getSheet(type);
+String usrid=id;
+System.out.println(id);
+int last=sheet.getLastRowNum();
+arr[0][0]="----AMOUNT----";
+arr[0][1]="----NOTE------ ";
+System.out.println(type+" TRANSACTIONS ON "+date);
+for(int i=1;i<=last;i++){
+if(usrid.equals(sheet.getRow(i).getCell(0).getStringCellValue())&&
+date.equals(sheet.getRow(i).getCell(1).getStringCellValue())){
+flag++;
+arr[t][0]=sheet.getRow(i).getCell(3).getNumericCellValue();
+arr[t][1]=sheet.getRow(i).getCell(2).getStringCellValue();
+t++;
+}
+}
+System.out.println(arr[0][0]+" "+ arr[0][1]);
+for(int i=1;i<flag;i++){
+for(int j=0;j<2;j++){
+System.out.print(arr[i][j]+" ");
+}
+System.out.println("");
+}
+l.loginpage(0,usrid);
+}catch(Exception e){
+System.out.println(e.getMessage());
+}
+}
+void netsummary(String id){
+filepath fi=new filepath();
+int income=0;
+int expence=0;
+Object arr[][]=new Object[100][2];
+File f=new File(fi.path());
+try{
+FileInputStream exel=new FileInputStream(f);
+XSSFWorkbook book=new XSSFWorkbook(exel);
+XSSFSheet inc=book.getSheet("INCOME");
+XSSFSheet exp=book.getSheet("EXPENCES");
+int ilast=inc.getLastRowNum();
+int elast=exp.getLastRowNum();
+String usrid=id;
+for(int i=1;i<=ilast;i++){
+if(usrid.equals(inc.getRow(i).getCell(0).getStringCellValue())){
+income+=inc.getRow(i).getCell(3).getNumericCellValue();
+}
+}
+for(int i=0;i<=elast;i++){
+if(usrid.equals(exp.getRow(i).getCell(0).getStringCellValue())){
+expence+=exp.getRow(i).getCell(3).getNumericCellValue();
+}
+}
+System.out.println("TOTAL INCOME :$"+income);
+System.out.println("TOTAL EXPENCE:$"+expence);
+int bal=income-expence;
+System.out.println("NET BALANCE :$"+bal);
+l.loginpage(0,usrid);
+}catch(Exception e){
+System.out.println(e.getMessage());
+}
+}
+}
